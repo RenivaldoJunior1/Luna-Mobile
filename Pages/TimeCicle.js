@@ -57,7 +57,7 @@ export default function TimeCicle({ navigation }) {
                 </View>
         <ButtonPrimary
           title="Proximo"
-          onPress={() => navigation.navigate('StartPilula')}
+          onPress={() => navigation.navigate('Home')}
         />
       </View>
     </ImageBackground>

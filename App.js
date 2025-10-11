@@ -9,6 +9,8 @@ import DaysScreen from './Pages/DaysScreen';
 import StartpilulaScreen from './Pages/StartPilulaScreen';
 import LastMentruacaoScreen from './Pages/LastMenstruacaoScreen';
 import TimeCicle from './Pages/TimeCicle';
+import Home from './Pages/Home';
+import Notification from './Pages/notificationScreen';
 
 
 import './global.css';
@@ -22,7 +24,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator 
-  initialRouteName="Welcome" 
+  initialRouteName="TimeCiclo" 
   screenOptions={{ headerShown: false }}
 >
   <Stack.Screen name="Welcome" component={WelcomeScreen} />
@@ -33,6 +35,8 @@ export default function App() {
   <Stack.Screen name="StartPilula" component={StartpilulaScreen} />
   <Stack.Screen name="LastMenstruacao" component={LastMentruacaoScreen} />
   <Stack.Screen name="TimeCiclo" component={TimeCicle} />
+  <Stack.Screen name="Home" component={Home} />
+  <Stack.Screen name="Notification" component={Notification} />
 </Stack.Navigator>
 
     </NavigationContainer>
