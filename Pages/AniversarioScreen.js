@@ -75,7 +75,9 @@ export default function BirthdayPicker({ navigation }) {
 
     
     <View className="mt-60">
-      <ButtonPrimary title="Proximo" className="w-full" onPress={() => navigation.navigate('AcScreen')} />
+      <ButtonPrimary title="Proximo" className="w-full" onPress={() => navigation.navigate('AcScreen', {
+    birthday: { day, month, year }
+  })}  />
     </View>
   </View>
 </ImageBackground>

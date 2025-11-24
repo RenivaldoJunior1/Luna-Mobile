@@ -13,12 +13,14 @@ export default function BottomNav({ navigation }) {
       </View>
 
       {/* Ícones laterais */}
-      <TouchableOpacity className="items-center">
+      <TouchableOpacity className="items-center"
+      onPress={() => navigation.navigate('Home')}>
         <Ionicons name="refresh-circle-outline" size={26} color="#7BDCB5" />
         <Text className="text-[#7BDCB5] text-xs mt-1">Hoje</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity className="items-center">
+      <TouchableOpacity className="items-center"
+       onPress={() => navigation.navigate('Calendario')}>
         <Ionicons name="calendar-outline" size={24} color="#9A9AA1" />
         <Text className="text-[#9A9AA1] text-xs mt-1">Calendário</Text>
       </TouchableOpacity>
@@ -35,7 +37,9 @@ export default function BottomNav({ navigation }) {
 </TouchableOpacity>
 
 
-      <TouchableOpacity className="items-center">
+      <TouchableOpacity className="items-center"
+      onPress={() => navigation.navigate('Configuracao')}>
+        
         <Ionicons name="settings-outline" size={24} color="#9A9AA1" />
         <Text className="text-[#9A9AA1] text-xs mt-1">Configurações</Text>
       </TouchableOpacity>

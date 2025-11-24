@@ -3,7 +3,8 @@ import { View, TouchableOpacity, ImageBackground, Text } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import ButtonPrimary from 'components/ButtonPrimary';
 
-export default function DaysScreen({ navigation }) {
+export default function DaysScreen({ navigation, route }) {
+   const { birthday, method } = route.params;
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -52,7 +53,11 @@ export default function DaysScreen({ navigation }) {
 
         <ButtonPrimary 
           title="Proximo"
-          onPress={() => navigation.navigate('StartPilula')}
+          onPress={() => navigation.navigate('StartPilula', {
+    birthday,
+    method,
+    daysWithoutPause: currentDay
+  })}
         />
       </View>
     </ImageBackground>

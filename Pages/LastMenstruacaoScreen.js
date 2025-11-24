@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ImageBackground } from "react-native";
 import { Calendar } from "react-native-calendars";
 import ButtonPrimary from 'components/ButtonPrimary';
 
-export default function LastMenstruacaoScreen({ navigation }) {
+export default function LastMenstruacaoScreen({ navigation, route}) {
+   const { birthday, method, daysWithoutPause, startDate } = route.params;
+   const [lastMenstruationDate, setLastMenstruationDate] = useState(null);
   return (
     <ImageBackground
       source={require("../assets/BackGround/BACKGROUNDHOME.png")}
@@ -25,22 +27,35 @@ export default function LastMenstruacaoScreen({ navigation }) {
         </View>
         {/* Calendário ocupando toda a largura */}
         <Calendar
-          className="self-stretch"
-          theme={{
-            todayTextColor: "#FE9C6B",
-            selectedDayBackgroundColor: "#FE9C6B",
-            arrowColor: "#FE9C6B",
-          }}
-          onDayPress={(day) => console.log("Dia selecionado", day)}
-        />
+  className="self-stretch"
+  theme={{
+    todayTextColor: "#FE9C6B",
+    selectedDayBackgroundColor: "#FE9C6B",
+    arrowColor: "#FE9C6B",
+  }}
+  onDayPress={(day) => setLastMenstruationDate(day.dateString)} // YYYY-MM-DD
+  markedDates={lastMenstruationDate ? { [lastMenstruationDate]: { selected: true, selectedColor: "#FE9C6B" } } : {}}
+/>
         <View className="items-center mt-10">
 
         </View>
         {/* Botão de confirmação */}
         <ButtonPrimary
-                  title="Proximo"
-                  onPress={() => navigation.navigate('TimeCiclo')}
-                />
+  title="Proximo"
+  onPress={() => {
+    if (!lastMenstruationDate) {
+      alert("Selecione a data da última menstruação.");
+      return;
+    }
+    navigation.navigate('TimeCiclo', {
+      birthday,
+      method,
+      daysWithoutPause,
+      startDate,
+      lastMenstruationDate
+    });
+  }}
+/>
       </View>
     </ImageBackground>
   );

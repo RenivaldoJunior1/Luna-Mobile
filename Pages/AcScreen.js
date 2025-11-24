@@ -3,7 +3,8 @@ import { View, TouchableOpacity, ImageBackground, Text } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import ButtonPrimary from 'components/ButtonPrimary';
 
-export default function MethodsScreen({ navigation }) {
+export default function MethodsScreen({ navigation, route  }) {
+  const { birthday } = route.params;
   const methods = [
     { name: 'Pílula Combinada', description: 'A pílula combinada contém os produtos químicos estrogênio e progesterona. Este é o tipo mais amplamente reconhecido de pílula hormonal para prevenção da concepção.' },
     { name: 'Pílula de Progesterona', description: 'Esta pílula contém apenas progesterona e é indicada para mulheres que não podem tomar estrogênio.' },
@@ -68,7 +69,10 @@ export default function MethodsScreen({ navigation }) {
       )}
     </View>
      <View className="mt-10">
-           <ButtonPrimary title="Proximo" className="w-full" onPress={() => navigation.navigate('Days')} />
+           <ButtonPrimary title="Proximo" className="w-full" onPress={() => navigation.navigate('Days', { 
+    birthday, 
+    method: currentMethod.name 
+  })}  />
          </View>
   </View>
 

@@ -1,75 +1,116 @@
-import { useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = "http://192.168.0.102:8080";
+// ⚠️ Para emulador Android Studio use: 10.0.2.2
+// ⚠️ Para celular físico use: 10.0.0.183
+const API_URL = 'http://10.0.0.183:8080/auth';
 
 export default function useAuth() {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
 
-  // Login
-  const login = async (email, password) => {
-    const res = await fetch(`${API_URL}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+  // Carrega dados salvos ao iniciar
+  useEffect(() => {
+    loadStorageData();
+  }, []);
 
-    if (!res.ok) throw new Error("Credenciais inválidas");
+  async function loadStorageData() {
+    try {
+      const storedToken = await AsyncStorage.getItem('@lunna:token');
+      const storedUser = await AsyncStorage.getItem('@lunna:user');
 
-    const data = await res.json();
-    setToken(data.accessToken);
-    await AsyncStorage.setItem("token", data.accessToken);
+      if (storedToken && storedUser) {
+        setToken(storedToken);
+        setUser(JSON.parse(storedUser));
+        console.log('✅ Dados carregados do storage');
+      }
+    } catch (error) {
+      console.error('❌ Erro ao carregar storage:', error);
+    }
+  }
 
-    const userData = await getCurrentUser(data.accessToken);
-    setUser(userData);
+  async function register(email, senha, nome, apelido) {
+    try {
+      const response = await fetch(`${API_URL}/registrar`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          nome,
+          apelido,
+          email, 
+          senha 
+        }),
+      });
 
-    // 🔹 Log aqui garante que já existe token e usuário
-    console.log("=== Login realizado ===");
-    console.log("Token:", data.accessToken);
-    console.log("Usuário:", userData);
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || 'Erro ao registrar');
+      }
 
-    return userData;
-  };
+      const data = await response.json();
+      console.log('✅ Registro bem-sucedido:', data);
+      return data;
+    } catch (error) {
+      console.error('❌ Erro no registro:', error);
+      throw error;
+    }
+  }
 
-  // Registro
-  const register = async (email, password) => {
-    const res = await fetch(`${API_URL}/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+  async function login(email, senha) {
+    try {
+      const response = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, senha }),
+      });
 
-    if (!res.ok) throw new Error("Erro ao registrar");
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || 'Credenciais inválidas');
+      }
 
-    const registeredUser = await res.json();
+      const data = await response.json();
+      const { token: newToken, email: userEmail, cargo } = data;
 
-    // 🔹 Log para registro
-    console.log("=== Registro realizado ===");
-    console.log("Usuário registrado:", registeredUser);
+      const userData = { email: userEmail, cargo };
 
-    return registeredUser;
-  };
+      // Salva no AsyncStorage
+      await AsyncStorage.setItem('@lunna:token', newToken);
+      await AsyncStorage.setItem('@lunna:user', JSON.stringify(userData));
 
-  // Pegar usuário logado
-  const getCurrentUser = async (jwt) => {
-    const res = await fetch(`${API_URL}/auth/me`, {
-      headers: { Authorization: `Bearer ${jwt || token}` },
-    });
+      // Atualiza estado
+      setToken(newToken);
+      setUser(userData);
 
-    if (!res.ok) throw new Error("Erro ao buscar usuário");
-    const userData = await res.json();
-    setUser(userData);
-    return userData;
-  };
+      console.log('✅ Login bem-sucedido');
+      console.log('Token:', newToken);
+      console.log('User:', userData);
 
-  // Logout
-  const logout = async () => {
-    setUser(null);
+      return userData;
+    } catch (error) {
+      console.error('❌ Erro no login:', error);
+      throw error;
+    }
+  }
+
+  async function logout() {
+    await AsyncStorage.removeItem('@lunna:token');
+    await AsyncStorage.removeItem('@lunna:user');
     setToken(null);
-    await AsyncStorage.removeItem("token");
-    console.log("Usuário deslogado");
-  };
+    setUser(null);
+    console.log('✅ Logout realizado');
+  }
 
-  return { user, token, login, register, logout, getCurrentUser };
+  return {
+    user,
+    token,
+    signed: !!user,
+    login,
+    register,
+    logout,
+  };
 }

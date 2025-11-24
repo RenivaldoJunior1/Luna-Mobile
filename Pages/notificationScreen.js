@@ -1,92 +1,175 @@
 import React from "react";
 import {
-  ScrollView,
   View,
   Text,
-  Image,
+  ScrollView,
   TouchableOpacity,
   ImageBackground,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import BottomNav from "../components/BottomNav";
 
-export default function notification({ navigation }) {
-  const sections = [
+export default function NotificacoesScreen({ navigation }) {
+  const notificacoesHoje = [
     {
-      title: "Conheça seu ciclo",
-      cards: [
-        {
-          title: "Cólica e Desconforto: descubra formas de aliviar a dor",
-          image: require("../assets/notificacao1.png")
-        },
-        {
-          title: "Evite vazamentos na menstruação",
-          image: require("../assets/notificacao1.png")
-        },
-      ],
+      id: 1,
+      icone: "🩸",
+      iconeBg: "#fecaca",
+      titulo: "Sua menstruação está atrasada...",
+      descricao: "Tente entender o porque sua menstruação está atrasada...",
+      tempo: "2h atrás",
     },
     {
-      title: "Nosso guia sobre o fluxo",
-      cards: [
-        {
-          title: "Seu ciclo: Leve, médio ou intenso?",
-          image: require("../assets/notificacao1.png")
-        },
-        {
-          title: "Guia de produtos menstruais",
-          image: require("../assets/notificacao1.png")
-        },
-      ],
-    },
-    {
-      title: "Sexo",
-      cards: [
-        {
-          title: "Desejo e Libido: entenda como o ciclo influencia sua atração",
-          image: require("../assets/notificacao1.png")
-        },
-        {
-          title: "Escolha seu primeiro brinquedo sexual",
-          image: require("../assets/notificacao1.png")
-        },
-      ],
+      id: 2,
+      icone: "💊",
+      iconeBg: "#ddd6fe",
+      titulo: "Já tomou sua pílula?",
+      descricao: "Entenda o que acontece se não tomar sua pílula...",
+      tempo: "4h atrás",
     },
   ];
+
+  const notificacoesOntem = [
+    {
+      id: 3,
+      icone: "😊",
+      iconeBg: "#e0e7ff",
+      titulo: "Mudanças de humor?",
+      descricao: "As mudanças de humor podem ser várias causas, entenda...",
+      tempo: "Ontem",
+    },
+    {
+      id: 4,
+      icone: "🩸",
+      iconeBg: "#fecaca",
+      titulo: "Sua menstruação está atrasada...",
+      descricao: "Tente entender o porque sua menstruação está atrasada...",
+      tempo: "Ontem",
+    },
+  ];
+
+  const renderNotificacao = (notif) => (
+    <TouchableOpacity
+      key={notif.id}
+      style={{
+        backgroundColor: "#ffffff",
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 12,
+        flexDirection: "row",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
+      }}
+      activeOpacity={0.7}
+    >
+      {/* Ícone */}
+      <View
+        style={{
+          width: 48,
+          height: 48,
+          borderRadius: 24,
+          backgroundColor: notif.iconeBg,
+          alignItems: "center",
+          justifyContent: "center",
+          marginRight: 12,
+        }}
+      >
+        <Text style={{ fontSize: 24 }}>{notif.icone}</Text>
+      </View>
+
+      {/* Conteúdo */}
+      <View style={{ flex: 1 }}>
+        <Text
+          style={{
+            fontSize: 15,
+            fontWeight: "bold",
+            color: "#111827",
+            marginBottom: 4,
+          }}
+        >
+          {notif.titulo}
+        </Text>
+        <Text
+          style={{
+            fontSize: 13,
+            color: "#6b7280",
+            lineHeight: 18,
+          }}
+          numberOfLines={2}
+        >
+          {notif.descricao}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
     <ImageBackground
       source={require("../assets/BackGround/BackHome.png")}
-      resizeMode="cover"
       style={{ flex: 1 }}
+      resizeMode="cover"
     >
-      <ScrollView
-        className="flex-1"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
-      >
-        {sections.map((section, index) => (
-          <View key={index} className="mb-6">
-            <Text className="text-xl ml-4 font-bold mb-4">{section.title}</Text>
-            <View className="flex-row flex-wrap justify-between">
-              {section.cards.map((card, i) => (
-                <TouchableOpacity
-                  key={i}
-                  className={`w-[48%] mb-4 p-4 rounded-lg ${card.bg}`}
-                >
-                  <Image
-                    source={card.image}
-                    className="w-full h-34 mb-2 rounded-lg"
-                    resizeMode="cover"
-                  />
-                  <Text className="text-sm font-semibold">{card.title}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+      {/* Overlay semitransparente opcional */}
+      <View style={{ flex: 1 }}>
+        {/* Header */}
+        <View style={{ paddingTop: 100, paddingHorizontal: 20, paddingBottom: 16 }}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Ionicons name="notifications" size={24} color="#111827" />
+            <Text
+              style={{
+                fontSize: 24,
+                fontWeight: "bold",
+                color: "#111827",
+                marginLeft: 8,
+              }}
+            >
+              Notificações
+            </Text>
           </View>
-        ))}
-      </ScrollView>
+        </View>
 
-      {/* Footer fixo */}
-      <BottomNav navigation={navigation} />
+        {/* Conteúdo */}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        >
+          {/* Seção Hoje */}
+          <View style={{ paddingHorizontal: 20, marginBottom: 24 }}>
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#111827",
+                marginBottom: 12,
+              }}
+            >
+              Hoje
+            </Text>
+            {notificacoesHoje.map((notif) => renderNotificacao(notif))}
+          </View>
+
+          {/* Seção Ontem */}
+          <View style={{ paddingHorizontal: 20, marginBottom: 24 }}>
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#111827",
+                marginBottom: 12,
+              }}
+            >
+              Ontem
+            </Text>
+            {notificacoesOntem.map((notif) => renderNotificacao(notif))}
+          </View>
+        </ScrollView>
+
+        {/* Bottom Navigation */}
+        <BottomNav navigation={navigation} />
+      </View>
     </ImageBackground>
   );
 }

@@ -9,38 +9,87 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import ButtonPrimary from "../components/ButtonPrimary";
 import SocialLogin from "../components/SocialLogin";
 import useAuth from "../hooks/useAuth";
+import { verificarDadosMenstruais } from "../Services/dadosMenstruaisService";
 
 export default function AuthScreen({ navigation }) {
   const [mode, setMode] = useState("register");
   const [nome, setNome] = useState("");
+  const [apelido, setApelido] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarsenha, setconfirmarSenha] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Pega tudo do hook
   const { login, register } = useAuth();
 
   const handleSubmit = async () => {
+    setLoading(true);
+    
     try {
       if (mode === "login") {
+        console.log('🔑 Tentando login com:', email);
         await login(email, senha);
-        // ✅ Não precisa mais logar token/user aqui, já loga dentro do hook
-        navigation.navigate("Aniversario");
+        
+        console.log('✅ Login bem-sucedido! Verificando dados menstruais...');
+        
+        // Aguarda um pouco para garantir que o token foi salvo
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Verifica se o usuário já tem dados cadastrados usando o endpoint /listar
+        const temDados = await verificarDadosMenstruais();
+        
+        console.log('📊 Usuário tem dados menstruais?', temDados);
+        
+        if (temDados) {
+          console.log('✅ Usuário já tem dados! Redirecionando para Home...');
+          navigation.navigate("Home");
+        } else {
+          console.log('⚠️ Usuário não tem dados. Redirecionando para cadastro...');
+          navigation.navigate("Aniversario");
+        }
+        
       } else {
-        if (senha !== confirmarsenha) {
-          alert("As senhas não coincidem!");
+        console.log('📝 Dados do registro:', { nome, apelido, email, senha });
+        
+        // Validações
+        if (!nome.trim()) {
+          Alert.alert("Erro", "Preencha o nome completo!");
           return;
         }
-        await register(email, senha);
-        alert("Usuário registrado com sucesso! Faça login.");
-        setMode("login");
+        if (!apelido.trim()) {
+          Alert.alert("Erro", "Preencha o apelido!");
+          return;
+        }
+        if (!email.trim()) {
+          Alert.alert("Erro", "Preencha o email!");
+          return;
+        }
+        if (!senha.trim()) {
+          Alert.alert("Erro", "Preencha a senha!");
+          return;
+        }
+        if (senha !== confirmarsenha) {
+          Alert.alert("Erro", "As senhas não coincidem!");
+          return;
+        }
+        
+        console.log('✅ Validações OK, enviando para API...');
+        await register(email, senha, nome, apelido);
+        Alert.alert("Sucesso", "Usuário registrado! Faça login.", [
+          { text: "OK", onPress: () => setMode("login") }
+        ]);
       }
     } catch (err) {
-      alert(err.message);
+      console.error('❌ Erro no handleSubmit:', err);
+      Alert.alert("Erro", err.message || "Ocorreu um erro");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -72,6 +121,7 @@ export default function AuthScreen({ navigation }) {
                   }`}
                   onPress={() => setMode("register")}
                   activeOpacity={0.8}
+                  disabled={loading}
                 >
                   <Text className="text-lg font-bold text-black">Registre-se</Text>
                 </TouchableOpacity>
@@ -82,19 +132,37 @@ export default function AuthScreen({ navigation }) {
                   }`}
                   onPress={() => setMode("login")}
                   activeOpacity={0.8}
+                  disabled={loading}
                 >
                   <Text className="text-lg font-bold text-black">Login</Text>
                 </TouchableOpacity>
               </View>
 
               {mode === "register" && (
-                <TextInput
-                  className="bg-[#F2F2F7] py-4 px-2 rounded-lg mb-4 text-base mx-2"
-                  placeholder="Nome completo"
-                  placeholderTextColor="#999"
-                  value={nome}
-                  onChangeText={setNome}
-                />
+                <>
+                  <TextInput
+                    className="bg-[#F2F2F7] py-4 px-2 rounded-lg mb-4 text-base mx-2"
+                    placeholder="Nome completo"
+                    placeholderTextColor="#999"
+                    value={nome}
+                    onChangeText={(text) => {
+                      console.log('Nome digitado:', text);
+                      setNome(text);
+                    }}
+                    editable={!loading}
+                  />
+                  <TextInput
+                    className="bg-[#F2F2F7] py-4 px-2 rounded-lg mb-4 text-base mx-2"
+                    placeholder="Apelido"
+                    placeholderTextColor="#999"
+                    value={apelido}
+                    onChangeText={(text) => {
+                      console.log('Apelido digitado:', text);
+                      setApelido(text);
+                    }}
+                    editable={!loading}
+                  />
+                </>
               )}
 
               <TextInput
@@ -105,6 +173,7 @@ export default function AuthScreen({ navigation }) {
                 autoCapitalize="none"
                 value={email}
                 onChangeText={setEmail}
+                editable={!loading}
               />
 
               <TextInput
@@ -114,6 +183,7 @@ export default function AuthScreen({ navigation }) {
                 secureTextEntry
                 value={senha}
                 onChangeText={setSenha}
+                editable={!loading}
               />
 
               {mode === "register" && (
@@ -124,14 +194,21 @@ export default function AuthScreen({ navigation }) {
                   secureTextEntry
                   value={confirmarsenha}
                   onChangeText={setconfirmarSenha}
+                  editable={!loading}
                 />
               )}
 
               <View className="mt-5 mb-5">
-                <ButtonPrimary title="Confirmar" onPress={handleSubmit} />
+                {loading ? (
+                  <View className="bg-blue-500 py-4 mx-2 rounded-lg items-center justify-center">
+                    <ActivityIndicator size="small" color="#fff" />
+                  </View>
+                ) : (
+                  <ButtonPrimary title="Confirmar" onPress={handleSubmit} />
+                )}
               </View>
 
-              {mode === "login" && <SocialLogin />}
+              {mode === "login" && !loading && <SocialLogin />}
             </View>
           </ScrollView>
         </KeyboardAvoidingView>

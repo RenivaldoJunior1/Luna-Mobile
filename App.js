@@ -14,6 +14,9 @@ import Notification from './Pages/notificationScreen';
 
 
 import './global.css';
+import CalendarioScreen from 'Pages/CalenderScreen';
+import ConfiguracoesScreen from 'Pages/ConfiguracaoScreen';
+import ConhecaOCiclo from 'Pages/ConhecaOCiclo';
 
 
 
@@ -24,7 +27,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator 
-  initialRouteName="TimeCiclo" 
+  initialRouteName="Welcome" 
   screenOptions={{ headerShown: false }}
 >
   <Stack.Screen name="Welcome" component={WelcomeScreen} />
@@ -37,6 +40,9 @@ export default function App() {
   <Stack.Screen name="TimeCiclo" component={TimeCicle} />
   <Stack.Screen name="Home" component={Home} />
   <Stack.Screen name="Notification" component={Notification} />
+  <Stack.Screen name="Calendario" component={CalendarioScreen} />
+  <Stack.Screen name="Configuracao" component={ConfiguracoesScreen} />
+  <Stack.Screen name="ConhecaOCiclo" component={ConhecaOCiclo} />
 </Stack.Navigator>
 
     </NavigationContainer>

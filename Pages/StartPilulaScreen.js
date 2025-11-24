@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ImageBackground } from "react-native";
 import { Calendar } from "react-native-calendars";
 import ButtonPrimary from 'components/ButtonPrimary';
 
-export default function StartPilulaScreen({ navigation }) {
+export default function StartPilulaScreen({ navigation, route  }) {
+  const { birthday, method, daysWithoutPause } = route.params;
+    console.log("Data de nascimento:", birthday);
+  console.log("Método contraceptivo:", method);
+  console.log("Dias sem pausa:", daysWithoutPause);
+  
+  const [startDate, setStartDate] = useState(null);
   return (
     <ImageBackground
       source={require("../assets/BackGround/BACKGROUNDHOME.png")}
@@ -27,23 +33,35 @@ export default function StartPilulaScreen({ navigation }) {
 
         {/* Calendário */}
         <Calendar
-          className="self-stretch "
-          theme={{
-            todayTextColor: "#FE9C6B",
-            selectedDayBackgroundColor: "#FE9C6B",
-            arrowColor: "#FE9C6B",
-          }}
-          onDayPress={(day) => console.log("Dia selecionado", day)}
-        />
+  className="self-stretch"
+  theme={{
+    todayTextColor: "#FE9C6B",
+    selectedDayBackgroundColor: "#FE9C6B",
+    arrowColor: "#FE9C6B",
+  }}
+  onDayPress={(day) => setStartDate(day.dateString)} // YYYY-MM-DD
+  markedDates={startDate ? { [startDate]: { selected: true, selectedColor: "#FE9C6B" } } : {}}
+/>
 
         
         <View className="items-center mt-10">
 
         </View>
         <ButtonPrimary
-            title="Confirmar"
-            onPress={() => navigation.navigate('LastMenstruacao')}
-                />
+  title="Confirmar"
+  onPress={() => {
+    if (!startDate) {
+      alert("Selecione a data de início da pílula.");
+      return;
+    }
+    navigation.navigate('LastMenstruacao', {
+      birthday,
+      method,
+      daysWithoutPause,
+      startDate
+    });
+  }}
+/>
       </View>
       
     </ImageBackground>
